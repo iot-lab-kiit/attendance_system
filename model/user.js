@@ -5,14 +5,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     maxLength: 10,
+    unique:true,
   },
 
   email: {
     type: String,
     required: true,
+    unique:true,
   },
 
-  image:{
+  imageUUIDs:{
     type:[String],
     required: true,
   }
