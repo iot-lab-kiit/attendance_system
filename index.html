@@ -142,6 +142,9 @@
                 color: #333;
                 font-weight: bold;
             }
+            .blue{
+                color: #0087f7;
+            }
             #imageUpload{
                 visibility: hidden;
             }
@@ -256,14 +259,14 @@
                         "auth": "true"
                     }
                 })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        if (data.success) {
-                            alert(data.message);
-                        } else {
-                            alert(data.message);
-                            errorMessage.innerHTML = "Error submitting form!";
+                    .then(async (response) => {
+                        console.log(response.status)
+                        if(response.status=== 404){
+                            errorMessage.innerHTML = '<span>User not Found! Please <a href="register.html" class="blue">Register</a> the User.</span>';
+                            return;
                         }
+                        const data = await response.json();
+                        errorMessage.innerHTML = data.message;
                     })
                     .catch((error) => {
                         console.error("Error:", error);
