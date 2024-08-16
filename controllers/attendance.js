@@ -95,7 +95,7 @@ exports.getUserImage = async (req, res) => {
     if (!existingUser) {
       return res.status(404).json({
         success: false,
-        message: 'User not found',
+        message: 'User not',
       });
     }
     
@@ -137,19 +137,7 @@ exports.getUserImage = async (req, res) => {
 
 
 
-// header auth
-exports.auth = (req, res, next) => {
-  const auth = req.headers.auth;
 
-  if (auth === 'true') {
-    next(); 
-  } else {
-    return res.status(401).json({
-      success: false,
-      message: 'Unauthorized: Invalid or missing authentication',
-    });
-  }
-};
 
 
 
