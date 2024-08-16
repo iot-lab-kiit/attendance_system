@@ -27,7 +27,10 @@ if (email !== `${rollNumber}@kiit.ac.in`) {
   const existingUser =await user.findOne({ $or: [{ rollNumber }, { email }] });
 
     if (existingUser) {
-     
+      req.files.forEach(file => {
+        const filePath = path.join(__dirname, '../uploads/', file.filename);
+        fs.unlinkSync(filePath);
+      });
       return res.status(400).json({
         success: false,
         message: 'User with this roll number or email already exists',

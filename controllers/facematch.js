@@ -95,15 +95,15 @@ exports.matchUserImage = async (req, res) => {
 
     // Detect and extract features from the scanned image
     const scannedImageDescriptor = await faceapi.computeFaceDescriptor(scannedImage);
-
+    let distance;
     let matchFound = false;
     for (let storedImagePath of storedImagePaths) {
       let storedPath = path.join('uploads', storedImagePath.split('\\')[1]);
       const storedImage = await canvas.loadImage(storedPath);
       const storedImageDescriptor = await faceapi.computeFaceDescriptor(storedImage);
 
-      const distance = faceapi.euclideanDistance(scannedImageDescriptor, storedImageDescriptor);
-      if (distance < 0.6) {
+       distance = faceapi.euclideanDistance(scannedImageDescriptor, storedImageDescriptor);
+      if (distance < 0.4) {
         matchFound = true;
         break;
       }
@@ -114,12 +114,14 @@ exports.matchUserImage = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Face match successful. Attendance marked.",
+        score: distance
       });
     } else {
       fs.unlinkSync(scannedImagePath);
       return res.status(400).json({
         success: false,
         message: "Face match failed.",
+        score: distance
       });
     }
   } catch (err) {

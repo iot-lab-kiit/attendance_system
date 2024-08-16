@@ -142,6 +142,9 @@
                 color: #333;
                 font-weight: bold;
             }
+            #imageUpload{
+                visibility: hidden;
+            }
         </style>
         <!-- Font Awesome CDN for Camera Icon -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -157,17 +160,14 @@
                     <div class="form-header" id="formHeader">Form filled by: [Name]</div>
                     <form id="imageScannerForm" action="/api/imagescanner" method="POST" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" required />
+                            <label for="email">Email</label>
+                            <input type="text" id="email" name="email" required />
                         </div>
                         <div class="form-group">
-                            <label for="rollno">Roll No</label>
-                            <input type="text" id="rollno" name="rollno" required />
+                            <label for="rollNumber">Roll No</label>
+                            <input type="text" id="rollNumber" name="rollNumber" required />
                         </div>
-                        <div class="form-group">
-                            <label for="section">Section</label>
-                            <input type="text" id="section" name="section" required />
-                        </div>
+                        <input type="file" id="imageUpload" name="image" accept="image/*">
                         <div class="form-group">
                             <label for="image">Capture Image</label>
                             <div class="camera-container" onclick="toggleCamera()">
@@ -236,7 +236,7 @@
                     const file = new File([blob], "captured-image.png", {type: "image/png"});
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
-                    document.getElementById("uploadFile").files = dataTransfer.files;
+                    document.getElementById("imageUpload").files = dataTransfer.files;
 
                     const fileInfo = document.getElementById("fileInfo");
                     fileInfo.innerHTML = `Captured image uploaded successfully!`;
@@ -249,15 +249,19 @@
                 const form = new FormData(this);
                 const errorMessage = document.getElementById("errorMessage");
 
-                fetch("/api/imagescanner", {
+                fetch("http://localhost:3000/mark-attendance", {
                     method: "POST",
                     body: form,
+                    headers: {
+                        "auth": "true"
+                    }
                 })
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.success) {
-                            alert("Form submitted successfully!");
+                            alert(data.message);
                         } else {
+                            alert(data.message);
                             errorMessage.innerHTML = "Error submitting form!";
                         }
                     })
