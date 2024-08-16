@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Attendance Form</title>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f0f2f5;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                text-align: center;
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                max-width: 1200px; /* Adjusted max-width */
+            }
+            .logo {
+                margin-bottom: 20px;
+            }
+            .logo img {
+                width: 200px; /* Increased logo size */
+                height: auto;
+            }
+            .heading {
+                margin-bottom: 20px;
+                font-size: 24px;
+                font-weight: bold;
+                color: #333;
+            }
+            .form-container {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                max-width: 1000px;
+                background-color: white;
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                box-sizing: border-box; /* Ensure padding and borders are included in total width */
+            }
+            .form-fields {
+                flex: 1;
+                margin-right: 20px;
+            }
+            .camera-container {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 2px dashed #0087f7;
+                border-radius: 8px;
+                background-color: #f9f9f9;
+                height: 150px; /* Fixed height */
+                position: relative;
+                cursor: pointer;
+            }
+            .camera-box {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+                width: 100%;
+            }
+            .camera-box i {
+                font-size: 48px;
+                color: rgba(0, 0, 0, 0.2);
+                display: block;
+            }
+            .camera-box video {
+                display: none;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .camera-box.active video {
+                display: block;
+            }
+            .camera-box.active button {
+                display: block;
+            }
+            .camera-box button {
+                display: none;
+                margin-top: 10px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: bold;
+                color: #555;
+            }
+            .form-group input[type="text"] {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 14px;
+                color: #333;
+            }
+            .form-group button {
+                width: 100%;
+                padding: 12px;
+                background-color: #28a745;
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            .form-group button:hover {
+                background-color: #218838;
+            }
+            #fileInfo {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 14px;
+                color: #28a745;
+                font-weight: bold;
+            }
+            #errorMessage {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 14px;
+                color: #dc3545;
+                font-weight: bold;
+            }
+            .form-header {
+                margin-bottom: 10px;
+                font-size: 18px;
+                color: #333;
+                font-weight: bold;
+            }
+        </style>
+        <!-- Font Awesome CDN for Camera Icon -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="logo">
+                <img src="./public/kiit-logo.png" alt="KIIT Logo" />
+            </div>
+            <div class="heading">Attendance Form</div>
+            <div class="form-container">
+                <div class="form-fields">
+                    <div class="form-header" id="formHeader">Form filled by: [Name]</div>
+                    <form id="imageScannerForm" action="/api/imagescanner" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="rollno">Roll No</label>
+                            <input type="text" id="rollno" name="rollno" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="section">Section</label>
+                            <input type="text" id="section" name="section" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="image">Capture Image</label>
+                            <div class="camera-container" onclick="toggleCamera()">
+                                <div class="camera-box">
+                                    <i class="fas fa-camera"></i>
+                                    <video id="cameraStream" autoplay></video>
+                                    <button type="button" onclick="captureImage()">Capture Image</button>
+                                </div>
+                            </div>
+                            <div id="fileInfo"></div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit">Submit</button>
+                        </div>
+                        <div id="errorMessage"></div>
+                    </form>
+                </div>
+                <!-- Add space between left and right sections if needed -->
+            </div>
+        </div>
+
+        <script>
+            "use strict";
+
+            let stream;
+            const cameraContainer = document.querySelector(".camera-container");
+            const cameraBox = document.querySelector(".camera-box");
+            const cameraStream = document.getElementById("cameraStream");
+
+            function toggleCamera() {
+                if (cameraBox.classList.contains("active")) {
+                    stopCamera();
+                    cameraBox.classList.remove("active");
+                    cameraContainer.style.border = "2px dashed #0087f7";
+                } else {
+                    cameraBox.classList.add("active");
+                    cameraContainer.style.border = "none";
+                    startCamera();
+                }
+            }
+
+            async function startCamera() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    cameraStream.srcObject = stream;
+                } catch (error) {
+                    console.error("Error accessing camera:", error);
+                }
+            }
+
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach((track) => track.stop());
+                    cameraStream.srcObject = null;
+                }
+            }
+
+            function captureImage() {
+                const canvas = document.createElement("canvas");
+                canvas.width = cameraStream.videoWidth;
+                canvas.height = cameraStream.videoHeight;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(cameraStream, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob((blob) => {
+                    const file = new File([blob], "captured-image.png", {type: "image/png"});
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById("uploadFile").files = dataTransfer.files;
+
+                    const fileInfo = document.getElementById("fileInfo");
+                    fileInfo.innerHTML = `Captured image uploaded successfully!`;
+                });
+            }
+
+            document.getElementById("imageScannerForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const form = new FormData(this);
+                const errorMessage = document.getElementById("errorMessage");
+
+                fetch("/api/imagescanner", {
+                    method: "POST",
+                    body: form,
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            alert("Form submitted successfully!");
+                        } else {
+                            errorMessage.innerHTML = "Error submitting form!";
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        errorMessage.innerHTML = "An error occurred while submitting the form!";
+                    });
+            });
+        </script>
+    </body>
+</html>
