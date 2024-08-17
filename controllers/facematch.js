@@ -98,7 +98,10 @@ exports.matchUserImage = async (req, res) => {
     let distance;
     let matchFound = false;
     for (let storedImagePath of storedImagePaths) {
-      let storedPath = path.join('uploads', storedImagePath.split('\\')[1]);
+      //for windows
+      // let storedPath = path.join('uploads', storedImagePath.split('\\')[1]);
+      //for linux
+      let storedPath = path.join(storedImagePath);
       const storedImage = await canvas.loadImage(storedPath);
       const storedImageDescriptor = await faceapi.computeFaceDescriptor(storedImage);
 

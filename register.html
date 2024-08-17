@@ -259,7 +259,7 @@
             .then(async (response) => {
                 console.log(response.status)
                 if(response.status=== 404){
-                    errorMessage.innerHTML = '<span>User not Found! Please <a href="register.html" class="blue">Register</a> the User.</span>';
+                    errorMessage.innerHTML = '<span>User not Found! Please <a href="/user/register" class="blue">Register</a> the User.</span>';
                     return;
                 }
                 const data = await response.json();

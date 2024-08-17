@@ -161,7 +161,7 @@
             <div class="form-container">
                 <div class="form-fields">
                     <div class="form-header" id="formHeader">Form filled by: [Name]</div>
-                    <form id="imageScannerForm" action="/api/imagescanner" method="POST" enctype="multipart/form-data">
+                    <form id="imageScannerForm" action="" method="POST" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="email">Email</label>
                             <input type="text" id="email" name="email" required />
@@ -262,7 +262,7 @@
                     .then(async (response) => {
                         console.log(response.status)
                         if(response.status=== 404){
-                            errorMessage.innerHTML = '<span>User not Found! Please <a href="register.html" class="blue">Register</a> the User.</span>';
+                            errorMessage.innerHTML = '<span>User not Found! Please <a href="/user/register" class="blue">Register</a> the User.</span>';
                             return;
                         }
                         const data = await response.json();
