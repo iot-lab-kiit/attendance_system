@@ -58,9 +58,12 @@
                 border: 2px dashed #0087f7;
                 border-radius: 8px;
                 background-color: #f9f9f9;
-                height: 150px; /* Fixed height */
+                height: 300px; /* Fixed height */
+                width: 300px;
                 position: relative;
                 cursor: pointer;
+                margin-left: auto;
+                margin-right: auto;
             }
             .camera-box {
                 display: flex;
@@ -93,6 +96,7 @@
             }
             .form-group {
                 margin-bottom: 15px;
+
             }
             .form-group label {
                 display: block;
@@ -171,7 +175,7 @@
                             <input type="text" id="rollNumber" name="rollNumber" required />
                         </div>
                         <input type="file" id="imageUpload" name="image" accept="image/*">
-                        <div class="form-group">
+                        <div class="form-group centered">
                             <label for="image">Capture Image</label>
                             <div class="camera-container" onclick="toggleCamera()">
                                 <div class="camera-box">
@@ -198,15 +202,19 @@
             let stream;
             const cameraContainer = document.querySelector(".camera-container");
             const cameraBox = document.querySelector(".camera-box");
+            const cameraIcon = document.querySelector(".fa-camera");
             const cameraStream = document.getElementById("cameraStream");
 
             function toggleCamera() {
+
                 if (cameraBox.classList.contains("active")) {
                     stopCamera();
                     cameraBox.classList.remove("active");
+                    cameraIcon.style.display="block";
                     cameraContainer.style.border = "2px dashed #0087f7";
                 } else {
                     cameraBox.classList.add("active");
+                    cameraIcon.style.display="none";
                     cameraContainer.style.border = "none";
                     startCamera();
                 }
